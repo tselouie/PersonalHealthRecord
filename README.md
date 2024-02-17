@@ -1,5 +1,5 @@
 # Dockerized Python Server for a Note taking App
-This repository contains a Dockerfile and a Python script (server.py) to run a RESTful server that performs **CRUD** operations in SQL for a NoteTaker. The server is built using Python 3.11 and is dockerized for portability.
+This repository contains a Dockerfile and a Python script (server.py) to run a RESTful server that performs **CRUD** operations in SQL for a NoteTaker. The server is built using _Python 3.10.9_ and is dockerized for portability.
 
 
 ### Directory Structure
@@ -50,8 +50,6 @@ Once the image is built, you can run the Docker container using the following co
 ```bash
 docker run -dp 8010:8010 note-taker
 ```
-
-
 
 Run this code to containerize the sql and notetaker images from Docker:
 
