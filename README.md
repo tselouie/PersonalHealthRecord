@@ -1,7 +1,7 @@
 # Dockerized Python Server for a Note taking App
 This repository contains a Dockerfile and a Python script (server.py) to run a RESTful server that performs **CRUD** operations in SQL for a NoteTaker. The server is built using _Python 3.10.9_ and is dockerized for portability.
 
-
+[Github Repository Link](https://github.com/tselouie/NoteTakerAPI)
 ### Directory Structure
 
 | File          | Description                                           |
