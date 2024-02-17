@@ -62,10 +62,6 @@ docker-compose up
 
 The HTTP server inside the container will start, and listen on port 8010. You can access the server at http://localhost:8010.
 ## API Testing Endpoints
-
-
-
-
 #### Usage
 
 ##### Example request:
