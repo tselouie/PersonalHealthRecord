@@ -1,73 +1,151 @@
-# Dockerized Python Server for Toronto Time
-This repository contains a Dockerfile and a Python script (server.py) to run a RESTful server that performs
-CRUD operations in SQL for a NoteTaker. The server is built using Python 3.11 and is dockerized for easy deployment.
+# Dockerized Python Server for a Note taking App
+This repository contains a Dockerfile and a Python script (server.py) to run a RESTful server that performs **CRUD** operations in SQL for a NoteTaker. The server is built using Python 3.11 and is dockerized for portability.
 
 ### Setup
+Use this command to create a network
+```bash
+docker network create {NetworkName}
+```
 
 Use this command to create the database:
 
-`docker run --name {ContainerName} -p
-3306:3306 -e MYSQL_ROOT_PASSWORD={Password} -e MYSQL_DATABASE={DatabaseName} -d mysql:latest`
+```bash
+docker run --name {ContainerName} -p 3306:3306 -e MYSQL_ROOT_PASSWORD={Password} -e MYSQL_DATABASE={DatabaseName} -d mysql:latest
+```
 
-pip install python-dotenv
-pip install mysql-connector-python
-
-
-
-
-
-
-
-
-
-
-
-
-
-To build and run the Docker container:
-Ensure you have Docker installed on your system.
-Clone this repository to your local machine.
-Navigate to the root directory of the repository.
-Building the Docker Image
-To build the Docker image, run the following command:
+Install dependencies for the code
 
 ```bash
-docker build -t toronto-time-server .
+pip install python-dotenv mysql-connector-python
+or
+python -m pip install python-dotenv mysql-connector-python
 ```
-##### Running the Docker Container
+
+#### Environment Variables
+DATABASE_URL must be: ```host.docker.internal``` when app is hosted in container, otherwise localhost will work.
+
+
+
+#### Using Docker 
+
+Create Docker files:
+```bash 
+touch docker-compose.yml
+touch Dockerfile
+```
+Build our app using the settings in Dockerfile
+```bash
+docker build -t note-taker:version .
+```
 Once the image is built, you can run the Docker container using the following command:
 ```bash
-docker run -d -p 8010:8010 toronto-time-server
+docker run -dp 8010:8010 note-taker
 ```
-This will start the HTTP server inside the container, listening on port 8010. You can access the server at http://localhost:8010.
 
-Usage
-Once the server is running, you can send GET requests to http://localhost:8010 to retrieve the current time in Toronto in JSON format.
 
-##### Example request:
+
+Run this code to containerize the sql and notetaker images from Docker:
 ```bash
-curl http://localhost:8010
+docker-compose up
 ```
-##### Example response:
 
-```json
-{
-  "TorontoTime": "2024-02-15 12:00:00"
-}
-```
 
 #### Server Implementation Details
 The server is implemented using Python's built-in http.server module. It creates a simple HTTP server that handles GET requests by returning the current time in Toronto timezone as JSON.
 
-The logic for calculating the Toronto time is done by subtracting 5 hours from the current UTC time.
 
 #### Directory Structure
-Dockerfile: *Defines the Docker image for the server.*
-server.py: *Contains the implementation of the HTTP server.*
-README.md: *This file.*
 
-#### Contributions
-Contributions to improve or extend this project are welcome! If you encounter any issues or have suggestions for enhancements, please feel free to open an issue or submit a pull request.
+| File          | Description                                           |
+|---------------|-------------------------------------------------------|
+| Dockerfile    | Defines the Docker image for the server.              |
+| server.py     | Contains the implementation of the HTTP server.       |
+| .env.example  | Defines the structure for a .env file.                |
+| .gitignore    | Defines what we want to avoid pushing to the repo.    |
+
+
+### API Testing Endpoints
+
+This will start the HTTP server inside the container, listening on port 8010. You can access the server at http://localhost:8010.
+
+Usage
+Once the server is running, you can send requests to http://localhost:8010 to interact with the notetaker database and receive data in JSON format.
+
+##### Example request:
+**GET**: List All Notes
+**Description**: Retrieve a list of all notes.
+**Endpoint**: /
+**Method**: GET
+**Headers**: Content_type: application/json
+**Success Response**: 200 OK
+```json
+[
+  {
+    "id": "1",
+    "title": "Hello",
+    "content": "Time to code!",
+  },
+  {
+    "id": "2",
+    "title": "To-Do",
+    "content": "Call plumber, Renew car insurance",
+  }
+]
+```
+
+**POST**: Create a New Note
+**Description**: Create a new note.
+**Endpoint**: /create
+**Method**: POST
+**Headers**: 
+- Content_type: application/json
+**Body**:
+```json
+{
+  "title": "Title",
+  "content": "description"
+}
+```
+**Success Response**: 200 OK
+```json
+{"message": "Note created successfully!"}
+```
+
+**PUT**: Update a Note
+**Description**: Update a note given the id and new values of the entry in JSON format.
+**Endpoint**: /update
+**Method**: PUT
+**Headers**: 
+- Content_type: application/json
+**Body**:
+```json
+{
+  "id":"id of note",
+  "title": "Title",
+  "content": "description"
+}
+```
+**Success Response**: 200 OK
+```json
+{"message": "Note updated successfully!"}
+```
+
+**DELETE**: Delete a Note
+**Description**: Delete note given the id.
+**Endpoint**: /delete
+**Method**: DELETE
+**Headers**: 
+- Content_type: application/json
+**Body**:
+```json
+{
+  "id":"id of note to delete",
+}
+```
+**Success Response**: 200 OK
+```json
+{"message": "Note deleted successfully!"}
+```
 
 ##### License
 This project is licensed under the MIT License.
