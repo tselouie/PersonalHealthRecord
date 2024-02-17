@@ -5,14 +5,14 @@ import os
 import mysql.connector
 load_dotenv();  # take environment variables from .env.
 host=os.environ.get("DATABASE_URL")
-
+# function to connect to database
 def db_connection():
     return mysql.connector.connect(
     host=os.environ.get("DATABASE_URL"),
     user="root",
     database=os.environ.get("DATABASE_NAME"),
     password=os.environ.get("DATABASE_PASSWORD"))
-
+# Create a table if it does not exist
 def db_init():
     db = db_connection()
     cursor = db.cursor()
@@ -27,6 +27,7 @@ def db_init():
     print("Database initialized with notes table.")
     db.close()
 class RequestHandler(BaseHTTPRequestHandler):
+    # Get method that fetches all the notes from the database
     def do_GET(self):
         db = db_connection()
         cursor = db.cursor(dictionary=True)
@@ -39,7 +40,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             'data':notes
         })
         self.wfile.write(message.encode('utf-8'))
-        
+        # Post method that creates a note with title and content values in body object
     def do_POST(self):
         if self.path == '/create': 
             db = db_connection()
@@ -55,7 +56,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 'message':"Note created successfully!"
             })
             self.wfile.write(message.encode('utf-8'))
-
+    # Post method that update a note with id, title and content values in body object
     def do_PUT(self):
         if self.path == '/update':
             db = db_connection()
@@ -70,6 +71,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 'message':"Note updated successfully!"
             })
             self.wfile.write(message.encode('utf-8'))
+    # Delete method that deletes a note provided 'id' in body object
     def do_DELETE(self):
         if self.path == '/delete':
             db = db_connection()
