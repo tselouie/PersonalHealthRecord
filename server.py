@@ -47,7 +47,6 @@ class RequestHandler(BaseHTTPRequestHandler):
             # create note
             content_length = int(self.headers['Content-Length'])
             post_data = json.loads(self.rfile.read(content_length))
-            print(post_data)
             cursor.execute("INSERT INTO notes (title, content) VALUES (%s, %s)",(post_data['title'],post_data['content']))
             db.commit()
             self.send_response(200)
