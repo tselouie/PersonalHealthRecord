@@ -3,8 +3,9 @@ import json
 from dotenv import load_dotenv
 import os
 import mysql.connector
+from db_setup import db_init 
+from urllib.parse import urlparse, parse_qs
 load_dotenv();  # take environment variables from .env.
-host=os.environ.get("DATABASE_URL")
 # function to connect to database
 def db_connection():
     return mysql.connector.connect(
@@ -13,82 +14,54 @@ def db_connection():
     database=os.environ.get("DATABASE_NAME"),
     password=os.environ.get("DATABASE_PASSWORD"))
 # Create a table if it does not exist
-def db_init():
-    db = db_connection()
-    cursor = db.cursor()
-    cursor.execute("""
-        CREATE TABLE IF NOT EXISTS notes (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            title VARCHAR(255) NOT NULL,
-            content TEXT NOT NULL
-        )
-    """)
-    db.commit()
-    print("Database initialized with notes table.")
-    db.close()
+
 class RequestHandler(BaseHTTPRequestHandler):
+
+        
     # Get method that fetches all the notes from the database
     def do_GET(self):
+        parsed_path = urlparse(self.path)
+        path_parts = parsed_path.path.split('/')[1:]  # Split path and remove the first empty string
+        #if there are 2 parameters find rows by table and user
+        if len(path_parts) == 2 and path_parts[0] in ['users', 'healthrecords', 'medications', 'allergies', 'emergencycontacts']:
+            table, user_id = path_parts
+            self.handle_table_query(table, user_id)
+        #if there are 1 parameter return all rows for that table
+        elif len(path_parts) == 1  in ['users', 'healthrecords', 'medications', 'allergies', 'emergencycontacts']:
+            self.handle_table_query(table)
+        else:
+            self.send_error(404, "Resource not found")
+
+    # Use this function to fetch all the data from the database, user_id is optional if you want to fetch only 1
+    def handle_table_query(self, table, user_id=None):
         db = db_connection()
         cursor = db.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM notes")
-        notes = cursor.fetchall()
+        if user_id == None:
+            query = f"SELECT * FROM {table}"
+            cursor.execute(query)
+        else:
+            query = f"SELECT * FROM {table} WHERE UserID = %s"
+            cursor.execute(query, (user_id,))
+
+        rows = cursor.fetchall()
+        db.close()
+        
         self.send_response(200)
-        self.send_header('Content-Type','application/json')
+        self.send_header("Content-type", "application/json")
         self.end_headers()
-        message = json.dumps({
-            'data':notes
-        })
-        self.wfile.write(message.encode('utf-8'))
-        # Post method that creates a note with title and content values in body object
+        self.wfile.write(json.dumps(rows).encode())
+        
     def do_POST(self):
-        if self.path == '/create': 
-            db = db_connection()
-            cursor = db.cursor()
-            # create note
-            content_length = int(self.headers['Content-Length'])
-            post_data = json.loads(self.rfile.read(content_length))
-            cursor.execute("INSERT INTO notes (title, content) VALUES (%s, %s)",(post_data['title'],post_data['content']))
-            db.commit()
-            self.send_response(200)
-            self.end_headers()
-            message = json.dumps({
-                'message':"Note created successfully!"
-            })
-            self.wfile.write(message.encode('utf-8'))
+        pass
     # Post method that update a note with id, title and content values in body object
     def do_PUT(self):
-        if self.path == '/update':
-            db = db_connection()
-            cursor = db.cursor()
-            content_length = int(self.headers['Content-Length'])
-            put_data = json.loads(self.rfile.read(content_length))
-            cursor.execute("UPDATE notes SET title = %s, content = %s WHERE id = %s",(put_data["title"],put_data["content"],put_data["id"]))
-            db.commit()
-            self.send_response(200)
-            self.end_headers()
-            message = json.dumps({
-                'message':"Note updated successfully!"
-            })
-            self.wfile.write(message.encode('utf-8'))
+        pass
     # Delete method that deletes a note provided 'id' in body object
     def do_DELETE(self):
-        if self.path == '/delete':
-            db = db_connection()
-            cursor = db.cursor()
-            content_length = int(self.headers['Content-Length'])
-            post_data = json.loads(self.rfile.read(content_length))
-            cursor.execute("DELETE FROM notes WHERE id = %s",(post_data["id"],))
-            db.commit()
-            self.send_response(200)
-            self.end_headers()
-            message = json.dumps({
-                'message':"Note deleted successfully!"
-            })
-            self.wfile.write(message.encode('utf-8'))
+        pass
 
 def run(serverClass=HTTPServer,handlerClass=RequestHandler,port=8010):
-    db_init() # create notes table
+    db_init() # create all tables and initial dataf
     serverAddress = ('',port)
     httpd = HTTPServer(serverAddress,RequestHandler)
     print(f'Starting httpd server on port {port}...')
