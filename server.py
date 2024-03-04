@@ -137,8 +137,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         #if there are 2 parameters find rows by table and user
         if len(path_parts) == 2 and path_parts[0] in ['users', 'healthrecords', 'medications', 'allergies', 'emergencycontacts']:
             table, action = path_parts
-            if action == "create":
-                
+            if action == "create": 
                 if self.handle_create_row(table,post_data):
                     self.send_response(200)
                     self.end_headers()
@@ -155,7 +154,7 @@ class RequestHandler(BaseHTTPRequestHandler):
         data = json.loads(data_str)
 
         if table == "users":
-            query = "INSERT INTO Users (Username, PasswordHash, Email, FullName, DateOfBirth, Gender) VALUES (%s, %s, %s, %s, %s, %s)"
+            query = "INSERT INTO Users (Username, PasswordHash, Email, FullName, DateOfBirth, Gender, Active) VALUES (%s, %s, %s, %s, %s, %s,1)"
             values = (data['Username'], data['PasswordHash'], data['Email'], data['FullName'], data['DateOfBirth'], data['Gender'])
 
         elif table == "healthrecords":
@@ -184,15 +183,101 @@ class RequestHandler(BaseHTTPRequestHandler):
         db.close()
         return True
     
-    # Post method that update a note with id, title and content values in body object
+    # Post method that update a record with id, title and content values in body object
     def do_PUT(self):
-        pass
-    # Delete method that deletes a note provided 'id' in body object
+        parsed_path = urlparse(self.path)
+        path_parts = parsed_path.path.split('/')[1:]  # Split path and remove the first empty string
+        
+        # Expecting the URL format to be /{table}/{id} for the PUT request
+        if len(path_parts) == 2 and path_parts[0] in ['users', 'healthrecords', 'medications', 'allergies', 'emergencycontacts']:
+            table, record_id = path_parts
+            content_length = int(self.headers['Content-Length'])
+            put_data = self.rfile.read(content_length)
+            
+            if self.handle_update_row(table, record_id, put_data):
+                self.send_response(200)
+                self.end_headers()
+                self.wfile.write(b"Data updated successfully")
+            else:
+                self.send_response(400)
+                self.end_headers()
+                self.wfile.write(b"Error updating data")
+
+    def handle_update_row(self, table, id, data):
+        db = db_connection()
+        cursor = db.cursor(dictionary=True)
+        data_str = data.decode('utf-8')
+        data = json.loads(data_str)
+
+        # Construct the SQL query and values based on the table
+        if table == "users":
+            query = "UPDATE Users SET Username = %s, PasswordHash = %s, Email = %s, FullName = %s, DateOfBirth = %s, Gender = %s WHERE ID = %s"
+            values = (data['Username'], data['PasswordHash'], data['Email'], data['FullName'], data['DateOfBirth'], data['Gender'], id)
+
+        elif table == "healthrecords":
+            query = "UPDATE Healthrecords SET UserID = %s, RecordType = %s, RecordDate = %s, Description = %s, ProviderName = %s WHERE ID = %s"
+            values = (data['UserID'], data['RecordType'], data['RecordDate'], data['Description'], data['ProviderName'], id)
+
+        elif table == "medications":
+            query = "UPDATE Medications SET UserID = %s, MedicationName = %s, Dosage = %s, StartDate = %s, EndDate = %s, Reason = %s WHERE ID = %s"
+            values = (data['UserID'], data['MedicationName'], data['Dosage'], data['StartDate'], data['EndDate'], data['Reason'], id)
+
+        elif table == "allergies":
+            query = "UPDATE Allergies SET UserID = %s, Allergen = %s, Reaction = %s, Severity = %s WHERE ID = %s"
+            values = (data['UserID'], data['Allergen'], data['Reaction'], data['Severity'], id)
+
+        elif table == "emergencycontacts":
+            query = "UPDATE Emergencycontacts SET UserID = %s, FullName = %s, Relationship = %s, Phone = %s, Email = %s WHERE ID = %s"
+            values = (data['UserID'], data['FullName'], data['Relationship'], data['Phone'], data['Email'], id)
+
+        else:
+            db.close()  # Ensure the connection is closed in case of an invalid table
+            return False
+
+        try:
+            cursor.execute(query, values)
+            db.commit()
+        except mysql.connector.Error as err:
+            print("Something went wrong: {}".format(err))
+            return False
+        finally:
+            cursor.close()
+            db.close()
+
+        return True
+    # Delete method that deletes a record provided 'id' in body object
+
+    def handle_delete_row(self,table,id):
+        db = db_connection()
+        cursor = db.cursor()
+        parsed_tablename = table[0].upper() + table[1:] if table else table
+        query = f"DELETE FROM {parsed_tablename} WHERE ID = %s"
+        cursor.execute(query, (id,))
+        db.commit()
+        db.close()
+
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(f"{table} {id} deleted".encode())
+
     def do_DELETE(self):
-        pass
+        parsed_path = urlparse(self.path)
+        path_parts = parsed_path.path.split('/')[1:]  # Split path and remove the first empty string
+
+        if len(path_parts) != 2:
+            self.send_error(400, "URL must be in the format /table_name/id")
+            return
+        
+        table, id = path_parts
+        try:
+            self.handle_delete_row(table, int(id))  # Assuming ID is an integer
+        except ValueError:  # In case the ID is not an integer
+            self.send_error(400, "ID must be an integer")
+        except Exception as e:
+            self.send_error(500, f"Internal server error: {str(e)}")
 
 def run(serverClass=HTTPServer,handlerClass=RequestHandler,port=8010):
-    db_init() # create all tables and initial dataf
+    db_init() # create all tables and initial records
     serverAddress = ('',port)
     httpd = HTTPServer(serverAddress,RequestHandler)
     print(f'Starting httpd server on port {port}...')
