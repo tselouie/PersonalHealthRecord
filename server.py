@@ -29,7 +29,6 @@ def parse_dates(obj):
 class RequestHandler(BaseHTTPRequestHandler):
 
     # Fetch records from database
-    # first 
     def do_GET(self):
         parsed_path = urlparse(self.path)
         parameters = parse_qs(parsed_path.query)
