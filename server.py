@@ -69,12 +69,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             cursor.execute(query, (user_id,))
 
         rows = cursor.fetchall()
-        # for row in rows:
-        #     for key, value in row.items():
-        #     # Check if the value is an instance of datetime.datetime
-        #         if isinstance(value, datetime.date):
-        #             # Convert datetime to string with the specified format and update the dictionary
-        #             row[key] = value.strftime("%m/%d/%Y")
+   
         rows = parse_dates(rows)
 
         cursor.close()
