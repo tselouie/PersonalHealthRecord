@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS Users (
     Gender CHAR(1)
 );
 
-CREATE TABLE IF NOT EXISTS HealthRecords (
+CREATE TABLE IF NOT EXISTS Healthrecords (
     RecordID SERIAL PRIMARY KEY,
     UserID INTEGER NOT NULL,
     RecordType VARCHAR(255) NOT NULL,
@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS Allergies (
     FOREIGN KEY (UserID) REFERENCES Users(UserID)
 );
 
-CREATE TABLE IF NOT EXISTS EmergencyContacts (
+CREATE TABLE IF NOT EXISTS Emergencycontacts (
     ContactID SERIAL PRIMARY KEY,
     UserID INTEGER NOT NULL,
     FullName VARCHAR(255) NOT NULL,
@@ -53,23 +53,3 @@ INSERT IGNORE INTO Users (Username, PasswordHash, Email, FullName, DateOfBirth, 
 VALUES
 ('johndoe', 'e4r5t6y7u8i9o0p', 'john.doe@example.com', 'John Doe', '1985-01-01', 'M'),
 ('janedoe', 'u8y7t6r5e4w3q2', 'jane.doe@example.com', 'Jane Doe', '1990-02-02', 'F');
-
-INSERT INTO HealthRecords (UserID, RecordType, RecordDate, Description, ProviderName)
-VALUES
-(1, 'Vaccination', '2020-03-01', 'COVID-19 vaccine, first dose', 'City Health Department'),
-(2, 'Vaccination', '2020-03-15', 'COVID-19 vaccine, first dose', 'Local Clinic')
-
-INSERT INTO Medications (UserID, MedicationName, Dosage, StartDate, EndDate, Reason)
-VALUES
-(1, 'Amoxicillin', '500mg three times a day', '2023-01-01', '2023-01-14', 'Bacterial Infection'),
-(2, 'Ibuprofen', '200mg as needed', '2023-02-01', NULL, 'Pain relief');
-
-INSERT INTO Allergies (UserID, Allergen, Reaction, Severity)
-VALUES
-(1, 'Peanuts', 'Hives, Swelling', 'High'),
-(2, 'Penicillin', 'Rash', 'Medium');
-
-INSERT INTO EmergencyContacts (UserID, FullName, Relationship, Phone, Email)
-VALUES
-(1, 'Emily Doe', 'Sister', '555-1234', 'emily.doe@example.com'),
-(2, 'David Doe', 'Brother', '555-5678', 'david.doe@example.com');
