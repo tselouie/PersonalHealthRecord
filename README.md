@@ -67,6 +67,17 @@ Run this code to containerize the sql image and build the application images and
 ```bash
 docker-compose up
 ```
+### Pushing to DockerHub
+```bash
+# Build the application
+docker-compose build app
+
+# Tag the build application with a name
+docker tag personalhealthrecord-app lttse/personalhealthrecord-api:v1
+
+# Push the image to DockerHub
+docker push lttse/personalhealthrecord-api:v1
+```
 
 The HTTP server inside the container will start, and listen on port 8010. You can access the server at http://localhost:8010.
 
