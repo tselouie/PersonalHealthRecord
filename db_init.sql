@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS Emergencycontacts (
 );
 
 
-INSERT IGNORE INTO ROLES (RoleName, PermissionLevel )
+INSERT IGNORE INTO Roles (RoleName, PermissionLevel )
 VALUES
 ('USER', 1),
 ('ADMIN', 5);
