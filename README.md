@@ -1,4 +1,4 @@
-# Dockerized Python Server for a Note taking App
+# Dockerized Python Server for a Personal Health Record keeping App
 This repository contains a Dockerfile and a Python script (server.py) to run a RESTful server that performs **CRUD** operations in SQL for a NoteTaker. The server is built using _Python 3.10.9_ and is dockerized for portability.
 
 [Github Repository Link](https://github.com/tselouie/PersonalHealthRecord)
@@ -93,4 +93,3 @@ This project uses MySQL database from Docker.
 
 - [Link to Documentation](https://documenter.getpostman.com/view/33019960/2sA2xfXYMX)
 - [Link to Postman Workspace](https://www.postman.com/orange-desert-612142/workspace/phr/overview)
-
