@@ -8,8 +8,9 @@ WORKDIR /app
 COPY . /app
 
 # Install dependencies
-RUN pip install python-dotenv mysql-connector-python
+RUN pip install python-dotenv mysql-connector-python requests bcrypt
 
+ENV DATABASE_URL=host.docker.internal
 #Expose the application port used in server.py
 EXPOSE 8010
 
