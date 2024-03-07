@@ -1,3 +1,9 @@
+CREATE TABLE IF NOT EXISTS ROLES (
+    RoleID SERIAL PRIMARY KEY,
+    RoleName VARCHAR(255) UNIQUE NOT NULL,
+    PermissionLevel INTEGER NOT NULL
+)
+
 CREATE TABLE IF NOT EXISTS Users (
     UserID INT AUTO_INCREMENT PRIMARY KEY,
     Username VARCHAR(255) UNIQUE NOT NULL,
@@ -6,7 +12,9 @@ CREATE TABLE IF NOT EXISTS Users (
     FullName VARCHAR(255) NOT NULL,
     DateOfBirth DATE NOT NULL,
     Gender CHAR(1),
-    Active TINYINT DEFAULT 0
+    Active TINYINT DEFAULT 0,
+    RoleID INT,
+    FOREIGN KEY (RoleID) REFERENCES Roles(RoleID)
 );
 
 CREATE TABLE IF NOT EXISTS Healthrecords (
@@ -50,7 +58,13 @@ CREATE TABLE IF NOT EXISTS Emergencycontacts (
     FOREIGN KEY (UserID) REFERENCES Users(UserID)
 );
 
-INSERT IGNORE INTO Users (Username, PasswordHash, Email, FullName, DateOfBirth, Gender, Active)
+
+INSERT IGNORE INTO ROLES (RoleName, PermissionLevel )
 VALUES
-('johndoe', 'e4r5t6y7u8i9o0p', 'john.doe@example.com', 'John Doe', '1985-01-01', 'M', 1),
-('janedoe', 'u8y7t6r5e4w3q2', 'jane.doe@example.com', 'Jane Doe', '1990-02-02', 'F', 1);
+('ADMIN', 5),
+('USER', 1);
+
+INSERT IGNORE INTO Users (Username, PasswordHash, Email, FullName, DateOfBirth, Gender, Active, RoleID)
+VALUES
+('johndoe', 'e4r5t6y7u8i9o0p', 'john.doe@example.com', 'John Doe', '1985-01-01', 'M', 1, 1),
+('janedoe', 'u8y7t6r5e4w3q2', 'jane.doe@example.com', 'Jane Doe', '1990-02-02', 'F', 1, 1);
