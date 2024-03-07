@@ -15,5 +15,5 @@ VALUES
 
 INSERT INTO Emergencycontacts (UserID, FullName, Relationship, Phone, Email)
 VALUES
-(1, 'Emily Doe', 'Sister', '555-1234', 'emily.doe@example.com',1),
-(2, 'David Doe', 'Brother', '555-5678', 'david.doe@example.com',1);
+(1, 'Emily Doe', 'Sister', '555-1234', 'emily.doe@example.com'),
+(2, 'David Doe', 'Brother', '555-5678', 'david.doe@example.com');
