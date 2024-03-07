@@ -71,7 +71,7 @@ docker-compose up
 The HTTP server inside the container will start, and listen on port 8010. You can access the server at http://localhost:8010.
 
 ## Database
-fThis project uses MySQL database from Docker.
+This project uses MySQL database from Docker.
 | File          | Description                                           |
 |---------------|-------------------------------------------------------|
 | db_init.sql   | This defines the table creations along with two dummy users.    |
@@ -80,6 +80,6 @@ fThis project uses MySQL database from Docker.
 
 ## API Testing Endpoints
 
-[Link to Documentation](https://documenter.getpostman.com/view/33019960/2sA2xfXYMX)
-[Link to Postman Workspace](https://www.postman.com/orange-desert-612142/workspace/phr/overview)
+- [Link to Documentation](https://documenter.getpostman.com/view/33019960/2sA2xfXYMX)
+- [Link to Postman Workspace](https://www.postman.com/orange-desert-612142/workspace/phr/overview)
 
