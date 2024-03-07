@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS Users (
     FullName VARCHAR(255) NOT NULL,
     DateOfBirth DATE NOT NULL,
     Gender CHAR(1),
-    Active TINYINT NOT NULL DEFAULT 0
+    Active TINYINT DEFAULT 0
 );
 
 CREATE TABLE IF NOT EXISTS Healthrecords (
@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS Emergencycontacts (
     FOREIGN KEY (UserID) REFERENCES Users(UserID)
 );
 
-INSERT IGNORE INTO Users (Username, PasswordHash, Email, FullName, DateOfBirth, Gender)
+INSERT IGNORE INTO Users (Username, PasswordHash, Email, FullName, DateOfBirth, Gender, Active)
 VALUES
-('johndoe', 'e4r5t6y7u8i9o0p', 'john.doe@example.com', 'John Doe', '1985-01-01', 'M'),
-('janedoe', 'u8y7t6r5e4w3q2', 'jane.doe@example.com', 'Jane Doe', '1990-02-02', 'F');
+('johndoe', 'e4r5t6y7u8i9o0p', 'john.doe@example.com', 'John Doe', '1985-01-01', 'M', 1),
+('janedoe', 'u8y7t6r5e4w3q2', 'jane.doe@example.com', 'Jane Doe', '1990-02-02', 'F', 1);
