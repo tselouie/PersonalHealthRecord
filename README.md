@@ -6,13 +6,15 @@ This repository contains a Dockerfile and a Python script (server.py) to run a R
 
 | File          | Description                                           |
 |---------------|-------------------------------------------------------|
+| docker-compose.yml    | Defines the container for both db and application.              |
 | Dockerfile    | Defines the Docker image for the server.              |
 | server.py     | Contains the implementation of the HTTP server.       |
 | .env.example  | Defines the structure for a .env file.                |
 | .gitignore    | Defines what we want to avoid pushing to the repo.    |
 
 
-### Setup
+### Setup 
+#### Run Locally
 Use this command to create a network
 ```bash
 docker network create {NetworkName}
@@ -23,7 +25,14 @@ Use this command to create the database:
 ```bash
 docker run --name {ContainerName} -p 3306:3306 -e MYSQL_ROOT_PASSWORD={Password} -e MYSQL_DATABASE={DatabaseName} -d mysql:latest
 ```
+Remember the ContainerName,Password, and DatabaseName as we will use them for our environment variables.
 
+Create `.env` file and use the values we used to create the database
+```bash
+DATABASE_URL=localhost
+DATABASE_PASSWORD={Password}
+DATABASE_NAME={DatabaseName}
+```
 Install dependencies for the code
 
 ```bash
@@ -32,9 +41,11 @@ or
 python -m pip install python-dotenv mysql-connector-python
 ```
 
-#### Environment Variables
-DATABASE_URL must be: ```host.docker.internal``` when app is hosted in container, otherwise localhost will work.
-
+Run the server - 
+*On first run, the server will create the tables and two dummy entries for each table.*
+```bash
+python server.py
+```
 #### Using Docker 
 
 Create Docker files:
@@ -44,102 +55,31 @@ touch Dockerfile
 ```
 Build our app using the settings in Dockerfile
 ```bash
-docker build -t note-taker:version .
+docker build -t personal-health-record-system:version .
 ```
 Once the image is built, you can run the Docker container using the following command:
 ```bash
-docker run -dp 8010:8010 note-taker
+docker run -dp 8010:8010 personal-health-record-system
 ```
 
-Run this code to containerize the sql and notetaker images from Docker:
+Run this code to containerize the sql image and build the application images and create a compiled container of both systems all in one command:
 
 ```bash
 docker-compose up
 ```
-*Note: the app may need to be re-run after a couple of seconds due to the load time of the application and mysql server.*
 
 The HTTP server inside the container will start, and listen on port 8010. You can access the server at http://localhost:8010.
+
+## Database
+fThis project uses MySQL database from Docker.
+| File          | Description                                           |
+|---------------|-------------------------------------------------------|
+| db_init.sql   | This defines the table creations along with two dummy users.    |
+| db_seed.sql   | This file holds the insert statements for dummy data.              |
+| db_setup.py   | This file holds the code to run the sql files to setup the database.     |
+
 ## API Testing Endpoints
-#### Usage
 
-##### Example request:
-**GET**: List All Notes
-**Description**: Retrieve a list of all notes.
-**Endpoint**: /
-**Method**: GET
-**Headers**: Content_type: application/json
-**Success Response**: 200 OK
-```json
-[
-  {
-    "id": "1",
-    "title": "Hello",
-    "content": "Time to code!",
-  },
-  {
-    "id": "2",
-    "title": "To-Do",
-    "content": "Call plumber, Renew car insurance",
-  }
-]
-```
+[Link to Documentation](https://documenter.getpostman.com/view/33019960/2sA2xfXYMX)
+[Link to Postman Workspace](https://www.postman.com/orange-desert-612142/workspace/phr/overview)
 
-**POST**: Create a New Note
-**Description**: Create a new note.
-**Endpoint**: /create
-**Method**: POST
-**Headers**: 
-- Content_type: application/json
-
-**Body**:
-```json
-{
-  "title": "Title",
-  "content": "description"
-}
-```
-**Success Response**: 200 OK
-```json
-{"message": "Note created successfully!"}
-```
-
-**PUT**: Update a Note
-**Description**: Update a note given the id and new values of the entry in JSON format.
-**Endpoint**: /update
-**Method**: PUT
-**Headers**: 
-- Content_type: application/json
-
-**Body**:
-```json
-{
-  "id":"id of note",
-  "title": "Title",
-  "content": "description"
-}
-```
-**Success Response**: 200 OK
-```json
-{"message": "Note updated successfully!"}
-```
-
-**DELETE**: Delete a Note
-**Description**: Delete note given the id.
-**Endpoint**: /delete
-**Method**: DELETE
-**Headers**: 
-- Content_type: application/json
-
-**Body**:
-```json
-{
-  "id":"id of note to delete",
-}
-```
-**Success Response**: 200 OK
-```json
-{"message": "Note deleted successfully!"}
-```
-
-##### License
-This project is licensed under the MIT License.
