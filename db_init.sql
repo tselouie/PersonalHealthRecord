@@ -1,8 +1,8 @@
-CREATE TABLE IF NOT EXISTS ROLES (
-    RoleID SERIAL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS Roles (
+    RoleID INT AUTO_INCREMENT PRIMARY KEY,
     RoleName VARCHAR(255) UNIQUE NOT NULL,
     PermissionLevel INTEGER NOT NULL
-)
+);
 
 CREATE TABLE IF NOT EXISTS Users (
     UserID INT AUTO_INCREMENT PRIMARY KEY,
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS Users (
     DateOfBirth DATE NOT NULL,
     Gender CHAR(1),
     Active TINYINT DEFAULT 0,
-    RoleID INT,
+    RoleID INT NOT NULL DEFAULT 1,
     FOREIGN KEY (RoleID) REFERENCES Roles(RoleID)
 );
 
@@ -61,8 +61,8 @@ CREATE TABLE IF NOT EXISTS Emergencycontacts (
 
 INSERT IGNORE INTO ROLES (RoleName, PermissionLevel )
 VALUES
-('ADMIN', 5),
-('USER', 1);
+('USER', 1),
+('ADMIN', 5);
 
 INSERT IGNORE INTO Users (Username, PasswordHash, Email, FullName, DateOfBirth, Gender, Active, RoleID)
 VALUES
