@@ -6,10 +6,13 @@ services:
       - "3306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: aabbccdd
-      MYSQL_DATABASE: notes
+      MYSQL_DATABASE: phr
   app:
-    image: note-taker
-    env_file:
-      - .env # Load environment variables from .env file into the service
+    build: .
     ports:
       - "8010:8010"
+    environment:
+      - DATABASE_URL=host.docker.internal
+      - DATABASE_NAME=phr
+    depends_on:
+      - db
