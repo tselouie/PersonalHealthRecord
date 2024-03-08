@@ -207,13 +207,16 @@ class RequestHandler(BaseHTTPRequestHandler):
         hashed_password = result['PasswordHash']
 
         if bcrypt.checkpw(password.encode(), hashed_password.encode()):
-            access_token="tempAuthorization"
+            access_token = "tempAuthorization"
             self.send_response(200)
+            self.send_header(
+                'Set-Cookie', f'access_token={access_token}; Path=/')
+            self.send_header("Content-type", "application/json")
             self.end_headers()
-            self.send_header('Set-Cookie', f'access_token={access_token}; Path=/')
 
             # Return a JSON response with the access token
-            response_data = {'message': 'Login successful', 'access_token': access_token}
+            response_data = {'message': 'Login successful',
+                             'access_token': access_token}
             self.wfile.write(json.dumps(response_data).encode('utf-8'))
             print("Login success!")
         else:
